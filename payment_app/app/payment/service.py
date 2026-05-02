@@ -1,0 +1,117 @@
+from fastapi import HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from db.models.merchant import Merchant
+from db.models.payment import PaymentIntent
+from payment.repository import PaymentIntentRepository
+from payment.schemas import CreatePaymentIntentRequest, PaymentIntentResponse
+
+
+class PaymentIntentService:
+    """
+    Service class for payment intents.
+    """
+    
+    @staticmethod
+    async def create(
+        request: CreatePaymentIntentRequest,
+        merchant: Merchant,
+        db: AsyncSession,
+    ) -> PaymentIntentResponse:
+        """
+        Service to create a payment intent.
+        Args:
+            request (CreatePaymentIntentRequest): The create payment intent request body.
+            merchant (Merchant): The current merchant.
+            db (AsyncSession): The database session.
+        Returns:
+            PaymentIntentResponse: The payment intent response.
+        """
+        # Create payment intent
+        row = PaymentIntent(
+            merchant_id=merchant.id,
+            amount=request.amount,
+            currency=request.currency,
+            status="CREATED",
+            order_id=request.order_id,
+        )
+        row = await PaymentIntentRepository.create(payment_intent=row, db=db)
+        print("Payment intent created:", row.id)
+
+        return PaymentIntentResponse(
+            payment_intent_id=row.id,
+            status=row.status,
+            amount=row.amount,
+            currency=row.currency,
+        )
+
+    @staticmethod
+    async def get_by_id(
+        payment_intent_id: str,
+        merchant: Merchant,
+        db: AsyncSession,
+    ) -> PaymentIntentResponse:
+        """
+        Service to get a payment intent by ID.
+        Args:
+            payment_intent_id: The ID of the payment intent.
+            merchant (Merchant): The current merchant.
+            db (AsyncSession): The database session.
+        Returns:
+            PaymentIntentResponse: The payment intent response.
+        """
+        # Get payment intent by ID
+        row = await PaymentIntentRepository.get_by_id(
+            payment_intent_id=payment_intent_id,
+            db=db,
+        )
+        if row is None:
+            print("Payment intent not found with ID:", payment_intent_id)
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Payment intent not found",
+            )
+        if row.merchant_id != merchant.id:
+            print("Payment intent does not belong to this merchant:", payment_intent_id)
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Payment intent does not belong to this merchant",
+            )
+        print("Payment intent found with ID:", payment_intent_id)
+
+        return PaymentIntentResponse(
+            payment_intent_id=row.id,
+            status=row.status,
+            amount=row.amount,
+            currency=row.currency,
+        )
+
+    @staticmethod
+    async def list_for_merchant(
+        merchant: Merchant,
+        db: AsyncSession,
+    ) -> list[PaymentIntentResponse]:
+        """
+        Service to list all payment intents for a merchant.
+        Args:
+            merchant (Merchant): The current merchant.
+            db (AsyncSession): The database session.
+        Returns:
+            list[PaymentIntentResponse]: The list of payment intents.
+        """
+        # List payment intents by merchant
+        rows = await PaymentIntentRepository.list_by_merchant(
+            merchant_id=merchant.id,
+            db=db,
+        )
+        print("Payment intents listed for merchant:", merchant.id)
+
+        return [
+            PaymentIntentResponse(
+                payment_intent_id=r.id,
+                status=r.status,
+                amount=r.amount,
+                currency=r.currency,
+            )
+            for r in rows
+        ]
