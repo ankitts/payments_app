@@ -3,9 +3,10 @@ import json
 
 import aio_pika
 from config import RMQConfig
+from db.database import init_db
 from interface.rmq_interface import RMQInterface
 from payment_processor.service import PaymentProcessor
-from payment_processor.schema import ProcessPaymentEvent
+from payment_processor.schemas import ProcessPaymentEvent
 from pydantic import ValidationError
 
 
@@ -16,6 +17,7 @@ async def _handle_delivery(message: aio_pika.IncomingMessage) -> None:
         process_payment_event = ProcessPaymentEvent(**payload)
 
         result = await PaymentProcessor.process_payment(process_payment_event)
+        
         if result["status"] == "success":
             await message.ack()
         else:
@@ -35,6 +37,8 @@ async def _handle_delivery(message: aio_pika.IncomingMessage) -> None:
 
 
 async def run_consumer() -> None:
+    await init_db()
+
     rmq_interface = RMQInterface()
     await rmq_interface.connect()
     try:

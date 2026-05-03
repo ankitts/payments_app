@@ -12,6 +12,8 @@ class RegisterMerchantRequest(BaseModel):
     business_name: str
     email: str
     password: str
+    webhook_url: str | None = None
+    webhook_secret: str | None = None
 
 
 class RegisterMerchantResponse(BaseModel):

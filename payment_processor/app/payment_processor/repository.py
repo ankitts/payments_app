@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from db.models.payment import PaymentIntent
+from db.models.merchant import Merchant
 
 class PaymentProcessorRepository:
 
@@ -39,3 +40,17 @@ class PaymentProcessorRepository:
         await db.commit()
         await db.refresh(payment_intent)
         return payment_intent
+
+
+class MerchantRepository:
+
+    @staticmethod
+    async def get_by_id(
+        merchant_id: str,
+        db: AsyncSession,
+    ) -> Merchant | None:
+        """
+        Repository to get a merchant by ID.
+        """ 
+        result = await db.execute(select(Merchant).where(Merchant.id == merchant_id))
+        return result.scalar_one_or_none()

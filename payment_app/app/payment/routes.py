@@ -37,7 +37,8 @@ async def create_payment_intent(
         )
     except HTTPException:
         raise
-    except Exception:
+    except Exception as e:
+        print(f"Error creating payment intent: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error",

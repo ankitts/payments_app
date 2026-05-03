@@ -49,6 +49,8 @@ class MerchantAuthService:
             email=body.email,
             hashed_password=hashed_password,
             api_key=api_key,
+            webhook_url=body.webhook_url,
+            webhook_secret=body.webhook_secret,
         )
         merchant = await MerchantRepository.create(merchant=merchant, db=db)
         print("Merchant created:", body.email)

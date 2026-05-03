@@ -84,3 +84,26 @@ class PaymentIntentRepository:
         await db.commit()
         await db.refresh(payment_intent)
         return payment_intent
+
+    @staticmethod
+    async def get_by_merchant_id_idempotency_key(
+        merchant_id: str,
+        idempotency_key: str,
+        db: AsyncSession,
+    ) -> PaymentIntent | None:
+        """
+        Repository to get a payment intent by merchant ID and idempotency key.
+        Args:
+            merchant_id (str): The ID of the merchant.
+            idempotency_key (str): The idempotency key of the payment intent.
+            db (AsyncSession): The database session.
+        Returns:
+            PaymentIntent | None: The payment intent if found, otherwise None.
+        """ 
+        result = await db.execute(
+            select(PaymentIntent).where(
+                PaymentIntent.merchant_id == merchant_id,
+                PaymentIntent.idempotency_key == idempotency_key
+            )
+        )
+        return result.scalar_one_or_none()

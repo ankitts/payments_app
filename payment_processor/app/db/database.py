@@ -22,6 +22,16 @@ class Base(DeclarativeBase):
     pass
 
 
+async def init_db() -> None:
+    """Create database objects for registered models if they do not exist yet."""
+    import db.models.merchant  # noqa: F401
+    import db.models.payment  # noqa: F401
+    import db.models.ledger  # noqa: F401
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
 async def get_db():
     async with AsyncSessionLocal() as session:
         yield session

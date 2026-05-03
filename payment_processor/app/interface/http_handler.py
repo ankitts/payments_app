@@ -7,7 +7,7 @@ class HTTPHandler:
         self.client = httpx.AsyncClient()
 
     @staticmethod
-    def get_instance():
+    def get_instance() -> httpx.AsyncClient:
         """
         Get the instance of the HTTP client.
         """

@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from db.models.merchant import Merchant
 from db.models.payment import PaymentIntent
@@ -8,7 +9,6 @@ from payment.schemas import CreatePaymentIntentRequest, PaymentIntentResponse
 from config import PaymentStatus
 from payment.utils import PaymentUtils
 from payment.schemas import PaymentIntentSchema
-
 
 class PaymentIntentService:
     """
@@ -30,17 +30,50 @@ class PaymentIntentService:
         Returns:
             PaymentIntentResponse: The payment intent response.
         """
+        # Check if payment intent already exists
+        row = await PaymentIntentRepository.get_by_merchant_id_idempotency_key(
+            merchant_id=merchant.id,
+            idempotency_key=request.idempotency_key,
+            db=db,
+        )
+        if row is not None and row.merchant_id == merchant.id:
+            print("Payment intent already exists with idempotency key:", request.idempotency_key)
+            if row.amount != request.amount or row.currency != request.currency or row.order_id != request.order_id:
+                print("Payment intent amount, currency, or order ID does not match:", request.idempotency_key)
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Payment intent amount, currency, or order ID does not match",
+                )
+            
+            print("Duplicate payment intent found, returning existing payment intent:", row.id)
+            return PaymentIntentResponse(
+                payment_intent_id=row.id,
+                status=row.status,
+                amount=row.amount,
+                currency=row.currency,
+            )
+
         # Create payment intent
         row = PaymentIntent(
             merchant_id=merchant.id,
+            idempotency_key=request.idempotency_key,
             amount=request.amount,
             currency=request.currency,
-            status="CREATED",
+            status=PaymentStatus.CREATED.value,
             order_id=request.order_id,
         )
-        row = await PaymentIntentRepository.create(payment_intent=row, db=db)
-        print("Payment intent created:", row.id)
-
+        try:
+            row = await PaymentIntentRepository.create(payment_intent=row, db=db)
+            print("Payment intent created:", row.id)
+        
+        except IntegrityError:
+            await db.rollback()
+            row = await PaymentIntentRepository.get_by_merchant_id_idempotency_key(
+                merchant_id=merchant.id,
+                idempotency_key=request.idempotency_key,
+                db=db,
+            )  
+ 
         return PaymentIntentResponse(
             payment_intent_id=row.id,
             status=row.status,

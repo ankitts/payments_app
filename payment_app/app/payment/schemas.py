@@ -6,10 +6,12 @@ class CreatePaymentIntentRequest(BaseModel):
     """
     Schema for creating a payment intent.
     Args:
+        idempotency_key (str): The idempotency key of the payment intent.
         amount (int): The amount of the payment intent.
         currency (str): The currency of the payment intent.
         order_id (str): The order ID of the payment intent.
     """
+    idempotency_key: str
     amount: int
     currency: str
     order_id: str

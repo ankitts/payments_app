@@ -51,3 +51,13 @@ class Merchant(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
+
+    webhook_url: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True
+    )
+
+    webhook_secret: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True
+    )

@@ -10,6 +10,10 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
+    import db.models.ledger  # noqa: F401
+    import db.models.payment  # noqa: F401
+    import db.models.merchant  # noqa: F401
+    
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
