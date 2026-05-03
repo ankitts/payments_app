@@ -66,3 +66,21 @@ class PaymentIntentRepository:
         )
         return list[PaymentIntent](result.scalars().all())
     
+
+    @staticmethod
+    async def update(
+        payment_intent: PaymentIntent,
+        db: AsyncSession,
+    ) -> PaymentIntent:
+        """
+        Repository to update a payment intent.
+        Args:
+            payment_intent (PaymentIntent): The payment intent to update.
+            db (AsyncSession): The database session.
+        Returns:
+            PaymentIntent: The updated payment intent.
+        """ 
+        db.add(payment_intent)
+        await db.commit()
+        await db.refresh(payment_intent)
+        return payment_intent

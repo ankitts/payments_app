@@ -5,6 +5,9 @@ from db.models.merchant import Merchant
 from db.models.payment import PaymentIntent
 from payment.repository import PaymentIntentRepository
 from payment.schemas import CreatePaymentIntentRequest, PaymentIntentResponse
+from config import PaymentStatus
+from payment.utils import PaymentUtils
+from payment.schemas import PaymentIntentSchema
 
 
 class PaymentIntentService:
@@ -115,3 +118,60 @@ class PaymentIntentService:
             )
             for r in rows
         ]
+
+    @staticmethod
+    async def confirm(
+        payment_intent_id: str,
+        merchant: Merchant,
+        db: AsyncSession,
+    ) -> PaymentIntentResponse:
+        """
+        Service to confirm a payment intent.
+        Args:
+            payment_intent_id: The ID of the payment intent.    
+            merchant (Merchant): The current merchant.
+            db (AsyncSession): The database session.
+        Returns:
+            PaymentIntentResponse: The payment intent response.
+        """
+        # Get payment intent by ID
+        row = await PaymentIntentRepository.get_by_id(
+            payment_intent_id=payment_intent_id,
+            db=db,
+        )
+        if row is None:
+            print("Payment intent not found with ID:", payment_intent_id)
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Payment intent not found",
+            )
+        if row.merchant_id != merchant.id:
+            print("Payment intent does not belong to this merchant:", payment_intent_id)
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Payment intent does not belong to this merchant",
+            )
+        if row.status != PaymentStatus.CREATED.value:
+            print("Payment status is already: ", row.status)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Payment status is already: " + row.status,
+            )
+        
+        # Confirm payment intent
+        row.status = PaymentStatus.PROCESSING.value
+        row = await PaymentIntentRepository.update(payment_intent=row, db=db)
+
+        payment_intent = PaymentIntentSchema.model_validate(row)
+
+        # Publish payment intent to payment processor
+        PaymentUtils.publish_payment_intent(payment_intent=payment_intent)
+
+        print("Payment intent recorded for processing:", row.id)
+
+        return PaymentIntentResponse(
+            payment_intent_id=row.id,
+            status=row.status,
+            amount=row.amount,
+            currency=row.currency,
+        )

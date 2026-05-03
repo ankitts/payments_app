@@ -107,3 +107,37 @@ async def list_payment_intents(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error",
         )
+
+
+@router.post(
+    "/{payment_intent_id}/confirm",
+    status_code=status.HTTP_200_OK,
+)
+async def confirm_payment_intent(
+    payment_intent_id: str,
+    merchant: Merchant = Depends(get_current_merchant),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Route to confirm a payment intent.
+    Args:
+        payment_intent_id: The ID of the payment intent.
+        merchant (Merchant): The current merchant.
+        db (AsyncSession): The database session.
+    Returns:
+        PaymentIntentResponse: The payment intent response.
+    """
+    try:
+        return await PaymentIntentService.confirm(
+            payment_intent_id=payment_intent_id,
+            merchant=merchant,
+            db=db,
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error confirming payment intent: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        )
