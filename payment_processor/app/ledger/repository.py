@@ -1,4 +1,4 @@
-from db.models.ledger import LedgerEntry
+from payments_db.models import LedgerEntry
 from sqlalchemy.ext.asyncio import AsyncSession
 
 class LedgerEntryRepository:

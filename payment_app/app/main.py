@@ -1,21 +1,21 @@
 from fastapi import FastAPI
 import uvicorn
 from auth.routes import router as auth_router
-from payment.routes import router as payment_intents_router
-from db.database import engine, Base
-from interface.rmq_interface import RMQInterface
+from payment.routes import router as payments_router
+from ledger.routes import router as ledger_router
+from wallet.routes import router as wallet_router
+from refund.routes import router as refunds_router
 from config import RMQConfig
+from db.session import engine
+from interface.rmq_interface import RMQInterface
+from payments_db.bootstrap import ensure_schema
 
 app = FastAPI()
 
+
 @app.on_event("startup")
 async def startup():
-    import db.models.ledger  # noqa: F401
-    import db.models.payment  # noqa: F401
-    import db.models.merchant  # noqa: F401
-    
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await ensure_schema(engine)
 
     rmq_interface = RMQInterface()
     rmq_interface.declare_exchange(
@@ -35,7 +35,10 @@ async def health():
     return {"message": "Health is fine."}
 
 app.include_router(auth_router)
-app.include_router(payment_intents_router)
+app.include_router(payments_router)
+app.include_router(ledger_router)
+app.include_router(wallet_router)
+app.include_router(refunds_router)
 
 if __name__ == "__main__":
     uvicorn.run(

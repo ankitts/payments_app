@@ -2,8 +2,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
-from db.models.merchant import Merchant
-from db.models.payment import PaymentIntent
+from payments_db.models import Merchant, PaymentIntent
 from payment.repository import PaymentIntentRepository
 from payment.schemas import CreatePaymentIntentRequest, PaymentIntentResponse
 from config import PaymentStatus

@@ -9,7 +9,9 @@ from auth.schemas import (
     RegisterMerchantResponse,
 )
 from auth.utils import AuthUtils
-from db.models.merchant import Merchant
+from payments_db.models import Merchant
+from wallet.repository import WalletRepository
+from payments_db.models import Wallet
 
 
 class MerchantAuthService:
@@ -54,6 +56,15 @@ class MerchantAuthService:
         )
         merchant = await MerchantRepository.create(merchant=merchant, db=db)
         print("Merchant created:", body.email)
+
+        # Create wallet for merchant
+        wallet = Wallet(
+            merchant_id=merchant.id,
+            available_balance=0,
+            pending_balance=0,
+            currency="INR",
+        )
+        wallet = await WalletRepository.create(wallet=wallet, db=db)
 
         return RegisterMerchantResponse(
             success=True,

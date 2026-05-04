@@ -1,10 +1,10 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import String, Boolean, DateTime
+from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from db.database import Base
+from payments_db.base import Base
 
 
 class Merchant(Base):
@@ -13,51 +13,51 @@ class Merchant(Base):
     id: Mapped[str] = mapped_column(
         String(36),
         primary_key=True,
-        default=lambda: str(uuid4())
+        default=lambda: str(uuid4()),
     )
 
     business_name: Mapped[str] = mapped_column(
         String(255),
-        nullable=False
+        nullable=False,
     )
 
     email: Mapped[str] = mapped_column(
         String(255),
         unique=True,
         nullable=False,
-        index=True
+        index=True,
     )
 
     hashed_password: Mapped[str] = mapped_column(
         String(255),
-        nullable=False
+        nullable=False,
     )
 
     api_key: Mapped[str] = mapped_column(
         String(255),
         unique=True,
         nullable=False,
-        index=True
+        index=True,
     )
 
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
-        nullable=False
+        nullable=False,
     )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-        nullable=False
+        nullable=False,
     )
 
     webhook_url: Mapped[str | None] = mapped_column(
         String(500),
-        nullable=True
+        nullable=True,
     )
 
     webhook_secret: Mapped[str | None] = mapped_column(
         String(255),
-        nullable=True
+        nullable=True,
     )

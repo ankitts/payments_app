@@ -514,6 +514,7 @@ dependencies = [
     { name = "bcrypt" },
     { name = "fastapi" },
     { name = "greenlet" },
+    { name = "payments-db" },
     { name = "pika" },
     { name = "python-dotenv" },
     { name = "python-jose", extra = ["cryptography"] },
@@ -528,12 +529,24 @@ requires-dist = [
     { name = "bcrypt", specifier = ">=5.0.0" },
     { name = "fastapi", specifier = ">=0.136.1" },
     { name = "greenlet", specifier = ">=3.5.0" },
+    { name = "payments-db", editable = "../packages/payments_db" },
     { name = "pika", specifier = ">=1.3.2" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "python-jose", extras = ["cryptography"], specifier = ">=3.5.0" },
     { name = "sqlalchemy", specifier = ">=2.0.49" },
     { name = "uvicorn", specifier = ">=0.46.0" },
 ]
+
+[[package]]
+name = "payments-db"
+version = "0.1.0"
+source = { editable = "../packages/payments_db" }
+dependencies = [
+    { name = "sqlalchemy" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "sqlalchemy", specifier = ">=2.0.49" }]
 
 [[package]]
 name = "pika"

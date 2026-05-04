@@ -1,9 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from db.models.payment import PaymentIntent
-from db.models.merchant import Merchant
+from payments_db.models import Merchant, PaymentIntent
 
-class PaymentProcessorRepository:
+class PaymentIntentRepository:
 
     @staticmethod
     async def get_by_id(
@@ -11,7 +10,7 @@ class PaymentProcessorRepository:
         db: AsyncSession,
     ) -> PaymentIntent | None:
         """
-        Repository to get a payment intent by ID.
+        Get a payment intent by id.
         Args:
             payment_intent_id (str): The ID of the payment intent.
             db (AsyncSession): The database session.
@@ -28,14 +27,7 @@ class PaymentProcessorRepository:
         payment_intent: PaymentIntent,
         db: AsyncSession,
     ) -> PaymentIntent:
-        """
-        Repository to update a payment intent.
-        Args:
-            payment_intent (PaymentIntent): The payment intent to update.
-            db (AsyncSession): The database session.
-        Returns:
-            PaymentIntent: The updated payment intent.
-        """ 
+        """Persist updates to an existing payment intent."""
         db.add(payment_intent)
         await db.commit()
         await db.refresh(payment_intent)

@@ -33,6 +33,8 @@ class RMQConfig(Enum):
 
     PAYMENT_PROCESSOR_ROUTING_KEY = os.getenv("PAYMENT_PROCESSOR_ROUTING_KEY")
 
+    REFUND_PROCESSOR_ROUTING_KEY = os.getenv("REFUND_PROCESSOR_ROUTING_KEY")
+
 
 class PaymentAppConfig(Enum):
 
@@ -52,3 +54,10 @@ class PaymentStatus(str, Enum):
     CANCELLED = "CANCELLED"
 
     REFUNDED = "REFUNDED"
+
+
+class RefundStatus(str, Enum):
+
+    PENDING = "PENDING"
+
+    SUCCESS = "SUCCESS"

@@ -5,7 +5,7 @@ from uuid import uuid4
 from sqlalchemy import DateTime, Enum as SQLEnum, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from db.database import Base
+from payments_db.base import Base
 
 
 class LedgerEntryType(str, PyEnum):
@@ -27,7 +27,7 @@ class LedgerEntry(Base):
         nullable=False,
     )
 
-    payment_intent_id: Mapped[str] = mapped_column(
+    operation_id: Mapped[str] = mapped_column(
         String(36),
         nullable=False,
     )

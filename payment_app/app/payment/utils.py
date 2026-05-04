@@ -20,7 +20,8 @@ class PaymentUtils:
             rmq_interface = RMQInterface()
 
             message = {
-                "payment_intent_id": payment_intent.id
+                "action": "PAYMENT",
+                "payment_intent_id": payment_intent.id,
             }
             
             rmq_interface.publish(

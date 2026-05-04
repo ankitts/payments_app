@@ -3,8 +3,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.database import get_db
-from db.models.merchant import Merchant
+from db.session import get_db
+from payments_db.models import Merchant
 from auth.repository import MerchantRepository
 from auth.utils import AuthUtils
 from config import JWTConfig

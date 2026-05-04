@@ -1,10 +1,10 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import String, DateTime, Integer, UniqueConstraint
+from sqlalchemy import DateTime, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from db.database import Base
+from payments_db.base import Base
 
 
 class PaymentIntent(Base):
@@ -14,7 +14,7 @@ class PaymentIntent(Base):
         UniqueConstraint(
             "merchant_id",
             "idempotency_key",
-            name="uq_merchant_id_idempotency_key"
+            name="uq_payment_intents_merchant_id_idempotency_key",
         ),
     )
 

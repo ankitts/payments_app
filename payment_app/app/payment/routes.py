@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.dependencies import get_current_merchant
-from db.database import get_db
-from db.models.merchant import Merchant
+from db.session import get_db
+from payments_db.models import Merchant
 from payment.schemas import CreatePaymentIntentRequest, PaymentIntentResponse
 from payment.service import PaymentIntentService
 

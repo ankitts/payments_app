@@ -345,6 +345,7 @@ dependencies = [
     { name = "asyncpg" },
     { name = "greenlet" },
     { name = "httpx" },
+    { name = "payments-db" },
     { name = "pydantic" },
     { name = "python-dotenv" },
     { name = "sqlalchemy" },
@@ -356,10 +357,22 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.31.0" },
     { name = "greenlet", specifier = ">=3.5.0" },
     { name = "httpx", specifier = ">=0.28.1" },
+    { name = "payments-db", editable = "../packages/payments_db" },
     { name = "pydantic", specifier = ">=2.13.3" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "sqlalchemy", specifier = ">=2.0.49" },
 ]
+
+[[package]]
+name = "payments-db"
+version = "0.1.0"
+source = { editable = "../packages/payments_db" }
+dependencies = [
+    { name = "sqlalchemy" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "sqlalchemy", specifier = ">=2.0.49" }]
 
 [[package]]
 name = "propcache"

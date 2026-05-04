@@ -1,7 +1,6 @@
-from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models.merchant import Merchant
+from payments_db.models import Merchant
 from ledger.schemas import LedgerEntrySchema
 from ledger.repository import LedgerEntryRepository
 

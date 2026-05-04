@@ -1,0 +1,9 @@
+{
+  "include": ["payment_app", "payment_processor", "packages"],
+  "exclude": ["**/.venv", "**/node_modules"],
+  "extraPaths": [
+    "packages/payments_db",
+    "payment_app/app",
+    "payment_processor/app"
+  ]
+}

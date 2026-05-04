@@ -1,20 +1,22 @@
 from datetime import datetime, timezone
-from enum import Enum as PyEnum
 from uuid import uuid4
 
-from sqlalchemy import DateTime, Enum as SQLEnum, Integer, String
+from sqlalchemy import DateTime, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from db.database import Base
+from payments_db.base import Base
 
 
-class LedgerEntryType(str, PyEnum):
-    DEBIT = "DEBIT"
-    CREDIT = "CREDIT"
+class Refund(Base):
+    __tablename__ = "refunds"
 
-
-class LedgerEntry(Base):
-    __tablename__ = "ledger_entry"
+    __table_args__ = (
+        UniqueConstraint(
+            "merchant_id",
+            "idempotency_key",
+            name="uq_refunds_merchant_id_idempotency_key",
+        ),
+    )
 
     id: Mapped[str] = mapped_column(
         String(36),
@@ -22,8 +24,8 @@ class LedgerEntry(Base):
         default=lambda: str(uuid4()),
     )
 
-    merchant_id: Mapped[str] = mapped_column(
-        String(36),
+    idempotency_key: Mapped[str] = mapped_column(
+        String(255),
         nullable=False,
     )
 
@@ -32,8 +34,8 @@ class LedgerEntry(Base):
         nullable=False,
     )
 
-    entry_type: Mapped[LedgerEntryType] = mapped_column(
-        SQLEnum(LedgerEntryType),
+    merchant_id: Mapped[str] = mapped_column(
+        String(36),
         nullable=False,
     )
 
@@ -47,7 +49,12 @@ class LedgerEntry(Base):
         nullable=False,
     )
 
-    description: Mapped[str] = mapped_column(
+    reason: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+    )
+
+    status: Mapped[str] = mapped_column(
         String(255),
         nullable=False,
     )

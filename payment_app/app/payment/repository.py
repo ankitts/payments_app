@@ -1,10 +1,7 @@
-from db.models.payment import PaymentIntent
-
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models.payment import PaymentIntent
+from payments_db.models import PaymentIntent
 
 
 class PaymentIntentRepository:

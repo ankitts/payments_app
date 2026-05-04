@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models.merchant import Merchant
+from payments_db.models import Merchant
 
 
 class MerchantRepository:

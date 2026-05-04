@@ -3,12 +3,12 @@ import json
 
 from config import PaymentStatus
 from payment_processor.schemas import ProcessPaymentEvent
-from db.database import AsyncSessionLocal
-from payment_processor.repository import PaymentProcessorRepository, MerchantRepository
+from db.session import AsyncSessionLocal
+from payment_processor.repository import MerchantRepository, PaymentIntentRepository
 from payment_processor.webhook_security import webhook_request_headers
 from interface.http_handler import HTTPHandler
 from ledger.service import LedgerService
-
+from wallet.service import WalletService
 
 class PaymentProcessor:
 
@@ -22,7 +22,7 @@ class PaymentProcessor:
         await asyncio.sleep(3)
 
         async with AsyncSessionLocal() as db:
-            payment_intent = await PaymentProcessorRepository.get_by_id(
+            payment_intent = await PaymentIntentRepository.get_by_id(
                 payment_intent_id, db
             )
             if not payment_intent:
@@ -38,9 +38,9 @@ class PaymentProcessor:
                 }
 
             payment_intent.status = PaymentStatus.SUCCESS.value
-            await PaymentProcessorRepository.update(payment_intent, db)
-
+            await PaymentIntentRepository.update(payment_intent, db)
             await LedgerService.create_credit_entry(payment_intent, db)
+            await WalletService.add_to_available_balance(payment_intent.merchant_id, payment_intent.amount, db)
             print(f"Payment intent processed successfully: {payment_intent_id}")
 
         await PaymentProcessor.send_webhook(payment_intent_id)
@@ -55,7 +55,7 @@ class PaymentProcessor:
         POST webhook JSON to merchant URL with X-Webhook-Signature (v1=HMAC-SHA256).
         """
         async with AsyncSessionLocal() as db:
-            payment_intent = await PaymentProcessorRepository.get_by_id(payment_intent_id, db)
+            payment_intent = await PaymentIntentRepository.get_by_id(payment_intent_id, db)
             if not payment_intent:
                 print(f"Payment intent not found for webhook: {payment_intent_id}")
                 return

@@ -8,7 +8,7 @@ from auth.schemas import (
     RegisterMerchantResponse,
 )
 from auth.service import MerchantAuthService
-from db.database import get_db
+from db.session import get_db
 
 router = APIRouter(prefix="/v1/auth", tags=["auth"])
 

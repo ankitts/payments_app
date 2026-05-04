@@ -7,7 +7,7 @@ class LedgerEntrySchema(BaseModel):
     Args:
         id (str): The ID of the ledger entry.
         merchant_id (str): The ID of the merchant.
-        payment_intent_id (str): The ID of the payment intent.
+        operation_id (str): The ID of the operation.
         entry_type (str): The type of the ledger entry.
         amount (int): The amount of the ledger entry.
         currency (str): The currency of the ledger entry.
@@ -15,7 +15,7 @@ class LedgerEntrySchema(BaseModel):
     """
     id: str
     merchant_id: str
-    payment_intent_id: str
+    operation_id: str
     entry_type: str
     amount: int
     currency: str

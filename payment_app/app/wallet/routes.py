@@ -4,17 +4,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth.dependencies import get_current_merchant
 from db.session import get_db
 from payments_db.models import Merchant
-from ledger.schemas import LedgerEntrySchema
-from ledger.service import LedgerService
+from wallet.schemas import WalletSchema
+from wallet.service import WalletService
 
-router = APIRouter(prefix="/v1/ledger", tags=["ledger"])
+router = APIRouter(prefix="/v1/wallet", tags=["wallet"])
 
 @router.get(
     "",
-    response_model=list[LedgerEntrySchema],
+    response_model=WalletSchema,
     status_code=status.HTTP_200_OK,
 )
-async def list_ledger_entries(
+async def get_wallet(
     merchant: Merchant = Depends(get_current_merchant),
     db: AsyncSession = Depends(get_db),
 ):
@@ -27,7 +27,7 @@ async def list_ledger_entries(
         list[LedgerEntrySchema]: The list of ledger entries.
     """
     try:
-        return await LedgerService.list_for_merchant(
+        return await WalletService.get_for_merchant(
             merchant=merchant,
             db=db,
         )
