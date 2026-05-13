@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { CardSurface } from "@/components/card-surface";
 import { RefundModal } from "@/components/refund-modal";
 import { StatusBadge } from "@/components/status-badge";
-import { formatUtcDate } from "@/lib/format";
+import { formatMinorCurrency, formatUtcDate } from "@/lib/format";
 import { isNormalizedApiError } from "@/lib/guards";
 import { queryKeys } from "@/lib/query-keys";
 import { fetchLedger } from "@/services/ledger";
@@ -132,10 +132,10 @@ export default function PaymentDetailPage() {
 
       <CardSurface title="Payment information">
         <dl className="grid gap-4 md:grid-cols-2">
-          <Field label="Amount" value={`${payment.amount.toLocaleString()} ${payment.currency}`} />
+          <Field label="Amount" value={formatMinorCurrency(payment.amount)} />
           <Field
             label="Refundable remaining"
-            value={`${payment.refundable_amount.toLocaleString()} ${payment.currency}`}
+            value={formatMinorCurrency(payment.refundable_amount)}
           />
           <Field label="Order ID" value={payment.order_id} />
           <Field
@@ -179,7 +179,7 @@ export default function PaymentDetailPage() {
                   <tr key={r.id}>
                     <td className="px-3 py-2 font-mono text-xs">{r.id}</td>
                     <td className="px-3 py-2 tabular-nums">
-                      {r.amount.toLocaleString()} {r.currency}
+                      {formatMinorCurrency(r.amount)}
                     </td>
                     <td className="px-3 py-2">
                       <StatusBadge status={r.status} />
@@ -221,7 +221,7 @@ export default function PaymentDetailPage() {
                     <td className="px-3 py-2 font-mono text-xs">{e.id}</td>
                     <td className="px-3 py-2">{e.entry_type}</td>
                     <td className="px-3 py-2 tabular-nums">
-                      {e.amount.toLocaleString()} {e.currency}
+                      {formatMinorCurrency(e.amount)}
                     </td>
                     <td className="px-3 py-2 text-xs text-on-surface-variant">
                       {e.description}
@@ -241,7 +241,6 @@ export default function PaymentDetailPage() {
         open={refundOpen}
         onClose={() => setRefundOpen(false)}
         paymentIntentId={id}
-        currency={payment.currency}
         maxRefundAmount={payment.refundable_amount}
         onSubmitRefund={async ({ amount, reason, idempotencyKey }) => {
           await createRefund({

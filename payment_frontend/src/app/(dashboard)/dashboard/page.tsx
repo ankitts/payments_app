@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { MetricBentoCard } from "@/components/metric-bento-card";
 import { StatusBadge } from "@/components/status-badge";
-import { formatUtcDate } from "@/lib/format";
+import { formatMinorCurrency, formatUtcDate } from "@/lib/format";
 import { queryKeys } from "@/lib/query-keys";
 import { fetchPaymentIntents } from "@/services/payments";
 import { fetchRefunds } from "@/services/refunds";
@@ -26,8 +26,8 @@ export default function DashboardPage() {
     queryFn: fetchRefunds,
   });
 
-  const payments = payQ.data ?? [];
-  const refunds = refQ.data ?? [];
+  const payments = useMemo(() => payQ.data ?? [], [payQ.data]);
+  const refunds = useMemo(() => refQ.data ?? [], [refQ.data]);
   const payMetrics = paymentMetrics(payments);
   const refMetrics = {
     total: refunds.length,
@@ -54,11 +54,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-lg md:grid-cols-3">
         <MetricBentoCard
           eyebrow="Wallet"
-          headline={
-            wallet
-              ? `${wallet.available_balance.toLocaleString()} ${wallet.currency}`
-              : "—"
-          }
+          headline={wallet ? formatMinorCurrency(wallet.available_balance) : "—"}
           icon={
             <span className="material-symbols-outlined !text-[26px]">
               account_balance_wallet
@@ -71,9 +67,7 @@ export default function DashboardPage() {
               Pending settlements
             </span>
             <span className="font-mono text-sm text-primary tabular-nums">
-              {wallet
-                ? `${wallet.pending_balance.toLocaleString()} ${wallet.currency}`
-                : "—"}
+              {wallet ? formatMinorCurrency(wallet.pending_balance) : "—"}
             </span>
           </div>
           {walletQ.isError ? (

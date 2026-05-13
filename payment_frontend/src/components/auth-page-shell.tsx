@@ -22,7 +22,7 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
               Fast. Secure. Universal.
             </h3>
             <p className="text-body-sm text-on-surface-variant">
-              Manage global payments and multi-currency wallets from a single interface.
+              Manage INR payments and wallet activity from a single interface.
             </p>
           </div>
         </div>

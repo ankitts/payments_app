@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AuthPageShell } from "@/components/auth-page-shell";
+import { StrideLogo } from "@/components/stride-logo";
 import { isNormalizedApiError } from "@/lib/guards";
 import { useAuth } from "@/providers/auth-provider";
 
@@ -48,9 +49,7 @@ export default function LoginPage() {
     <AuthPageShell>
       <div className="rounded-stitch-lg border border-outline-variant bg-surface-container-low p-xl shadow-stitch-card">
         <div className="mb-xl flex flex-col items-center text-center">
-          <div className="mb-md flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <span className="material-symbols-outlined !text-[28px]">payments</span>
-          </div>
+          <StrideLogo align="center" className="mb-md h-10 w-auto" />
           <h1 className="font-display text-headline-lg tracking-tight text-on-surface">
             Merchant login
           </h1>
@@ -83,24 +82,12 @@ export default function LoginPage() {
             </div>
           </div>
           <div>
-            <div className="mb-xs flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="text-body-sm font-medium text-on-surface-variant"
-              >
-                Password
-              </label>
-              <Link
-                href="#"
-                className="text-body-sm font-semibold text-primary hover:underline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  toast.message("Password reset is not wired in this demo.");
-                }}
-              >
-                Forgot password?
-              </Link>
-            </div>
+            <label
+              htmlFor="password"
+              className="mb-xs block text-body-sm font-medium text-on-surface-variant"
+            >
+              Password
+            </label>
             <div className="relative">
               <span className="material-symbols-outlined pointer-events-none absolute left-md top-1/2 !text-[20px] -translate-y-1/2 text-outline">
                 lock
@@ -128,26 +115,6 @@ export default function LoginPage() {
             ) : null}
           </button>
         </form>
-
-        <div className="my-lg flex items-center gap-md">
-          <span className="h-px flex-1 bg-outline-variant" />
-          <span className="flex items-center gap-xs whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-            <span className="material-symbols-outlined !text-[16px]">shield_lock</span>
-            Secure access
-          </span>
-          <span className="h-px flex-1 bg-outline-variant" />
-        </div>
-
-        <button
-          type="button"
-          className="flex w-full items-center justify-center gap-sm rounded-lg border border-outline-variant bg-transparent py-md text-body-sm font-semibold text-on-surface-variant transition hover:border-primary hover:bg-surface-container-high hover:text-on-surface"
-          onClick={() =>
-            toast.message("SSO is not configured in this environment.")
-          }
-        >
-          <span className="material-symbols-outlined !text-[20px]">key</span>
-          Continue with SSO
-        </button>
 
         <p className="mt-xl text-center text-body-sm text-on-surface-variant">
           No account yet?{" "}

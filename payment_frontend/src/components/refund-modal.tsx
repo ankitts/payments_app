@@ -3,13 +3,17 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
+import {
+  DISPLAY_CURRENCY,
+  formatMinorCurrency,
+  parseMajorCurrencyToMinor,
+} from "@/lib/format";
 import { isNormalizedApiError } from "@/lib/guards";
 
 type Props = {
   open: boolean;
   onClose: () => void;
   paymentIntentId: string;
-  currency: string;
   maxRefundAmount: number;
   onSubmitRefund: (args: {
     amount: number;
@@ -22,7 +26,6 @@ export function RefundModal({
   open,
   onClose,
   paymentIntentId,
-  currency,
   maxRefundAmount,
   onSubmitRefund,
 }: Props) {
@@ -34,13 +37,15 @@ export function RefundModal({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const amount = Number(amountStr);
-    if (!amount || amount <= 0) {
-      toast.error("Refund amount must be greater than zero.");
+    const amountMinor = parseMajorCurrencyToMinor(amountStr);
+    if (amountMinor === null) {
+      toast.error("Refund amount must be a positive INR value with up to 2 decimals.");
       return;
     }
-    if (amount > maxRefundAmount) {
-      toast.error(`Amount exceeds refundable balance (${maxRefundAmount}).`);
+    if (amountMinor > maxRefundAmount) {
+      toast.error(
+        `Amount exceeds refundable balance (${formatMinorCurrency(maxRefundAmount)}).`,
+      );
       return;
     }
     if (!reason.trim()) {
@@ -56,7 +61,7 @@ export function RefundModal({
     setLoading(true);
     try {
       await onSubmitRefund({
-        amount: Math.floor(amount),
+        amount: amountMinor,
         reason: reason.trim(),
         idempotencyKey,
       });
@@ -92,7 +97,7 @@ export function RefundModal({
             <p className="mt-1 text-xs text-on-surface-variant">
               Payment {paymentIntentId} · refundable up to{" "}
               <span className="font-semibold tabular-nums">
-                {maxRefundAmount.toLocaleString()} {currency}
+                {formatMinorCurrency(maxRefundAmount)}
               </span>
             </p>
           </div>
@@ -109,14 +114,14 @@ export function RefundModal({
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="mb-1 block text-sm font-medium text-on-surface-variant">
-              Refund amount ({currency}, integer)
+              Refund amount ({DISPLAY_CURRENCY}, rupees)
             </label>
             <input
-              inputMode="numeric"
-              pattern="[0-9]*"
+              inputMode="decimal"
               className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/30"
               value={amountStr}
               onChange={(ev) => setAmountStr(ev.target.value)}
+              placeholder="100.00"
             />
           </div>
           <div>

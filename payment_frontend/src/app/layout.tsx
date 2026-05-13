@@ -23,8 +23,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Payments Dashboard",
-  description: "Merchant payments dashboard",
+  title: "Stride Dashboard",
+  description: "Stride merchant dashboard",
 };
 
 export default function RootLayout({

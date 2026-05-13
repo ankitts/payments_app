@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 import { CardSurface } from "@/components/card-surface";
 import { StatusBadge } from "@/components/status-badge";
 import { usePaginatedSlice } from "@/hooks/use-paginated-slice";
-import { formatUtcDate } from "@/lib/format";
+import { formatMinorCurrency, formatUtcDate } from "@/lib/format";
 import { queryKeys } from "@/lib/query-keys";
 import { fetchRefunds } from "@/services/refunds";
 
@@ -101,7 +101,7 @@ export default function RefundsPage() {
                       </Link>
                     </td>
                     <td className="px-4 py-3 tabular-nums">
-                      {r.amount.toLocaleString()} {r.currency}
+                      {formatMinorCurrency(r.amount)}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={r.status} />

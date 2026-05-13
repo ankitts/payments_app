@@ -10,7 +10,9 @@ class AuthUtils:
     """
     Utility class for authentication.
     """
-        
+
+    API_KEY_PREFIX = "pk_test_"
+
     @staticmethod
     def hash_password(password: str) -> str:
         """
@@ -53,7 +55,7 @@ class AuthUtils:
         Returns:
             str: The generated API key.
         """
-        api_key = f"pk_test_{secrets.token_urlsafe(32)}"
+        api_key = f"{AuthUtils.API_KEY_PREFIX}{secrets.token_urlsafe(32)}"
         return api_key
     
     @staticmethod

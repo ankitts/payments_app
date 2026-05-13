@@ -23,6 +23,19 @@ class MerchantRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
+    async def get_by_api_key(api_key: str, db: AsyncSession) -> Merchant | None:
+        """
+        Repository to get a merchant by API key.
+        Args:
+            api_key (str): The merchant API key.
+            db (AsyncSession): The database session.
+        Returns:
+            Merchant | None: The merchant if found, otherwise None.
+        """
+        result = await db.execute(select(Merchant).where(Merchant.api_key == api_key))
+        return result.scalar_one_or_none()
+
+    @staticmethod
     async def get_by_id(merchant_id: str, db: AsyncSession) -> Merchant | None:
         """
         Repository to get a merchant by ID.

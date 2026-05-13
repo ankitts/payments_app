@@ -13,11 +13,14 @@ from db.session import engine
 from interface.rmq_interface import RMQInterface
 from payments_db.bootstrap import ensure_schema
 
-app = FastAPI()
+app = FastAPI(
+    title="Stride",
+    description="Merchant payments, wallets, refunds, and webhooks API.",
+)
 
 # Browsers treat localhost vs 127.0.0.1 as different origins; include both by default for dev.
 _default_cors = (
-    "http://localhost:3000"
+    "http://localhost:3000,http://localhost:3001"
 )
 _cors_origins = [
     o.strip()
@@ -52,7 +55,7 @@ async def startup():
 
 @app.get("/")
 async def health():
-    return {"message": "Health is fine."}
+    return {"message": "Health is fine.", "platform": "stride"}
 
 app.include_router(auth_router)
 app.include_router(payments_router)

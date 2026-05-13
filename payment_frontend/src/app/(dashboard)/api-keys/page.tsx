@@ -18,7 +18,7 @@ export default function ApiKeysPage() {
     <div className="mx-auto max-w-2xl space-y-6">
       <header>
         <p className="max-w-2xl text-body-md text-on-surface-variant">
-          Programmatic credentials for integrating your backend with the Payments API (
+          Programmatic credentials for integrating your backend with the Stride API (
           regenerate flow can be layered on later ).
         </p>
       </header>

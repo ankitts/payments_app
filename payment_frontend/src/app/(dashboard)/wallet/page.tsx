@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { CardSurface } from "@/components/card-surface";
-import { formatUtcDate } from "@/lib/format";
+import { formatMinorCurrency, formatUtcDate } from "@/lib/format";
 import { queryKeys } from "@/lib/query-keys";
 import { fetchLedger } from "@/services/ledger";
 import { fetchWallet } from "@/services/wallet";
@@ -45,10 +45,7 @@ export default function WalletPage() {
                   Available
                 </dt>
                 <dd className="mt-1 text-3xl font-semibold tabular-nums">
-                  {walletQ.data.available_balance.toLocaleString()}{" "}
-                  <span className="text-base text-on-surface-variant">
-                    {walletQ.data.currency}
-                  </span>
+                  {formatMinorCurrency(walletQ.data.available_balance)}
                 </dd>
               </div>
               <div>
@@ -56,8 +53,7 @@ export default function WalletPage() {
                   Pending
                 </dt>
                 <dd className="mt-1 text-xl font-medium tabular-nums text-on-surface-variant">
-                  {walletQ.data.pending_balance.toLocaleString()}{" "}
-                  {walletQ.data.currency}
+                  {formatMinorCurrency(walletQ.data.pending_balance)}
                 </dd>
               </div>
             </dl>
@@ -92,7 +88,7 @@ export default function WalletPage() {
                   <div className="text-right text-xs">
                     <span className="tabular-nums font-semibold">
                       {e.entry_type === "CREDIT" ? "+" : "-"}
-                      {e.amount.toLocaleString()} {e.currency}
+                      {formatMinorCurrency(e.amount)}
                     </span>
                   </div>
                 </li>

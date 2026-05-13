@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AuthPageShell } from "@/components/auth-page-shell";
+import { StrideLogo } from "@/components/stride-logo";
 import { isNormalizedApiError } from "@/lib/guards";
 import { useAuth } from "@/providers/auth-provider";
 import { registerMerchant } from "@/services/auth";
@@ -66,9 +67,7 @@ export default function SignupPage() {
     <AuthPageShell>
       <div className="rounded-stitch-lg border border-outline-variant bg-surface-container-low p-xl shadow-stitch-card">
         <div className="mb-xl flex flex-col items-center text-center">
-          <div className="mb-md flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <span className="material-symbols-outlined !text-[28px]">storefront</span>
-          </div>
+          <StrideLogo align="center" className="mb-md h-10 w-auto" />
           <h1 className="font-display text-headline-lg tracking-tight text-on-surface">
             Create merchant account
           </h1>

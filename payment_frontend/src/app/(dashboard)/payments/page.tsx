@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 import { CardSurface } from "@/components/card-surface";
 import { StatusBadge } from "@/components/status-badge";
 import { usePaginatedSlice } from "@/hooks/use-paginated-slice";
-import { formatUtcDate } from "@/lib/format";
+import { formatMinorCurrency, formatUtcDate } from "@/lib/format";
 import { queryKeys } from "@/lib/query-keys";
 import { fetchPaymentIntents } from "@/services/payments";
 import type { PaymentIntent } from "@/types/api";
@@ -21,7 +21,6 @@ export default function PaymentsPage() {
   });
 
   const [status, setStatus] = useState<string>("");
-  const [currency, setCurrency] = useState<string>("");
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
@@ -29,7 +28,6 @@ export default function PaymentsPage() {
     const q = search.trim().toLowerCase();
     return list.filter((p) => {
       if (status && p.status !== status) return false;
-      if (currency && p.currency !== currency) return false;
       if (q) {
         const idMatch = p.payment_intent_id.toLowerCase().includes(q);
         const orderMatch = p.order_id.toLowerCase().includes(q);
@@ -37,12 +35,7 @@ export default function PaymentsPage() {
       }
       return true;
     });
-  }, [data, status, currency, search]);
-
-  const currencies = useMemo(() => {
-    const set = new Set((data ?? []).map((p) => p.currency));
-    return Array.from(set).sort();
-  }, [data]);
+  }, [data, status, search]);
 
   const pag = usePaginatedSlice(filtered, 12);
 
@@ -73,37 +66,20 @@ export default function PaymentsPage() {
               setSearch(e.target.value);
             }}
           />
-          <div className="flex flex-wrap gap-3">
-            <select
-              className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
-              value={status}
-              onChange={(e) => {
-                pag.setPage(0);
-                setStatus(e.target.value);
-              }}
-            >
-              {STATUSES.map((s) => (
-                <option key={s || "_all"} value={s}>
-                  {s ? s : "All statuses"}
-                </option>
-              ))}
-            </select>
-            <select
-              className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
-              value={currency}
-              onChange={(e) => {
-                pag.setPage(0);
-                setCurrency(e.target.value);
-              }}
-            >
-              <option value="">All currencies</option>
-              {currencies.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
+            value={status}
+            onChange={(e) => {
+              pag.setPage(0);
+              setStatus(e.target.value);
+            }}
+          >
+            {STATUSES.map((s) => (
+              <option key={s || "_all"} value={s}>
+                {s ? s : "All statuses"}
+              </option>
+            ))}
+          </select>
         </div>
 
         {isLoading ? (
@@ -123,7 +99,6 @@ export default function PaymentsPage() {
                   <th className="px-4 py-3 font-medium">Order ID</th>
                   <th className="px-4 py-3 font-medium">Amount</th>
                   <th className="px-4 py-3 font-medium">Refundable</th>
-                  <th className="px-4 py-3 font-medium">Currency</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Created</th>
                 </tr>
@@ -182,13 +157,12 @@ function PaymentsRow({ intent }: { intent: PaymentIntent }) {
       <td className="px-4 py-3 text-xs text-on-surface-variant">{intent.order_id}</td>
       <td className="px-4 py-3 tabular-nums">
         <Link href={`/payments/${encodeURIComponent(intent.payment_intent_id)}`}>
-          {intent.amount.toLocaleString()}
+          {formatMinorCurrency(intent.amount)}
         </Link>
       </td>
       <td className="px-4 py-3 tabular-nums text-on-surface-variant">
-        {intent.refundable_amount.toLocaleString()}
+        {formatMinorCurrency(intent.refundable_amount)}
       </td>
-      <td className="px-4 py-3">{intent.currency}</td>
       <td className="px-4 py-3">
         <StatusBadge status={intent.status} />
       </td>

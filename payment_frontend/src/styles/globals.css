@@ -47,5 +47,5 @@
 
 /* Stitch: inputs sit on darker field than cards */
 .input-stitch {
-  @apply w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-md pl-md pr-md text-body-sm text-on-surface outline-none transition-all duration-200 placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/20;
+  @apply w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-md pl-12 pr-md text-body-sm text-on-surface outline-none transition-all duration-200 placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/20;
 }

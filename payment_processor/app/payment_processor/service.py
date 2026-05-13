@@ -89,16 +89,16 @@ class PaymentProcessor:
                 **webhook_request_headers(webhook_secret, body_str),
             }
 
-            client = HTTPHandler.get_instance()
-            response = await client.post(
-                webhook_url,
-                content=body_str.encode("utf-8"),
-                headers=headers,
+        client = HTTPHandler.get_instance()
+        response = await client.post(
+            webhook_url,
+            content=body_str.encode("utf-8"),
+            headers=headers,
+        )
+        if response.is_success:
+            print(f"Webhook delivered for payment intent {payment_intent_id}")
+        else:
+            print(
+                f"Webhook failed {response.status_code} for intent {payment_intent_id}: "
+                f"{response.text[:500]}"
             )
-            if response.is_success:
-                print(f"Webhook delivered for payment intent {payment_intent_id}")
-            else:
-                print(
-                    f"Webhook failed {response.status_code} for intent {payment_intent_id}: "
-                    f"{response.text[:500]}"
-                )

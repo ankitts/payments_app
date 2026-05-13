@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { StrideLogo } from "@/components/stride-logo";
 import { useAuth } from "@/providers/auth-provider";
 
 const NAV: { href: string; label: string; icon: string }[] = [
@@ -21,21 +22,16 @@ export function DashboardSidebar() {
 
   return (
     <aside className="fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r border-outline-variant bg-surface-container py-lg px-md">
-      <div className="mb-xl flex items-center gap-md px-md">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-container">
-          <span className="material-symbols-outlined text-on-primary-container !text-[22px]">
-            payments
-          </span>
-        </div>
-        <div className="min-w-0">
-          <p className="font-display text-headline-md font-semibold tracking-tight text-on-surface">
-            Merchant
-          </p>
-          <p className="text-[11px] font-medium uppercase tracking-wider text-on-surface-variant">
-            Payments
-          </p>
-        </div>
-      </div>
+      <Link
+        href="/dashboard"
+        aria-label="Stride dashboard"
+        className="mb-xl flex flex-col items-start gap-xs"
+      >
+        <StrideLogo />
+        <p className="pl-2 text-[11px] font-medium uppercase leading-none tracking-wider text-on-surface-variant">
+          Merchant dashboard
+        </p>
+      </Link>
 
       <nav className="flex flex-1 flex-col gap-xs">
         {NAV.map((item) => {

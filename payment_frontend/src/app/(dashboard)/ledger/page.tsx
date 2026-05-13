@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 
 import { CardSurface } from "@/components/card-surface";
 import { usePaginatedSlice } from "@/hooks/use-paginated-slice";
-import { formatUtcDate } from "@/lib/format";
+import { formatMinorCurrency, formatUtcDate } from "@/lib/format";
 import { queryKeys } from "@/lib/query-keys";
 import { fetchLedger } from "@/services/ledger";
 import type { LedgerEntry } from "@/types/api";
@@ -100,7 +100,6 @@ export default function LedgerPage() {
                   <th className="px-4 py-3">Entry ID</th>
                   <th className="px-4 py-3">Type</th>
                   <th className="px-4 py-3">Amount</th>
-                  <th className="px-4 py-3">Currency</th>
                   <th className="px-4 py-3">Description</th>
                   <th className="px-4 py-3">Created</th>
                 </tr>
@@ -111,9 +110,8 @@ export default function LedgerPage() {
                     <td className="px-4 py-3 font-mono text-xs">{entry.id}</td>
                     <td className="px-4 py-3">{entry.entry_type}</td>
                     <td className="px-4 py-3 tabular-nums">
-                      {entry.amount.toLocaleString()}
+                      {formatMinorCurrency(entry.amount)}
                     </td>
-                    <td className="px-4 py-3">{entry.currency}</td>
                     <td className="max-w-xs truncate px-4 py-3 text-xs text-on-surface-variant">
                       {entry.description}
                     </td>
