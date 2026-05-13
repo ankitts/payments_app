@@ -43,7 +43,7 @@ class RefundRepository:
         result = await db.execute(
             select(Refund).where(Refund.merchant_id == merchant_id)
         )
-        return list[Refund](result.scalars().all())
+        return list(result.scalars().all())
 
     @staticmethod
     async def get_by_merchant_id_idempotency_key(

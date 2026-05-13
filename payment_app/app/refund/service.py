@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from payments_db.models import Merchant, Refund
 from refund.schemas import CreateRefundRequest, CreateRefundResponse, RefundSchema
 from refund.repository import RefundRepository
-from config import RefundStatus
+from config import PaymentStatus, RefundStatus
 from payment.repository import PaymentIntentRepository
 from refund.utils import RefundUtils
 
@@ -55,7 +55,20 @@ class RefundService:
         if payment_intent.merchant_id != merchant.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Payment intent does not belong to this merchant")
 
-        # TODO: Check if remaining balance is enough for the refund
+        if payment_intent.status != PaymentStatus.SUCCESS.value:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Payment must be successful before requesting a refund",
+            )
+
+        if request.amount > payment_intent.refundable_amount:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(
+                    f"Refund amount exceeds refundable balance "
+                    f"({payment_intent.refundable_amount} {payment_intent.currency} available)"
+                ),
+            )
 
         refund = Refund(
             merchant_id=payment_intent.merchant_id,
@@ -106,7 +119,7 @@ class RefundService:
                 status=r.status,
                 reason=r.reason,
                 created_at=r.created_at,
-                updated_at=r.updated_at,
+                updated_at=r.created_at,
             )
             for r in refunds
         ]

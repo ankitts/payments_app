@@ -112,6 +112,7 @@ async def list_payment_intents(
 
 @router.post(
     "/{payment_intent_id}/confirm",
+    response_model=PaymentIntentResponse,
     status_code=status.HTTP_200_OK,
 )
 async def confirm_payment_intent(

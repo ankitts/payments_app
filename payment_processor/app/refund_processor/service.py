@@ -3,6 +3,7 @@ import asyncio
 from config import RefundStatus
 from refund_processor.schemas import RefundPaymentEvent
 from db.session import AsyncSessionLocal
+from payment_processor.repository import PaymentIntentRepository
 from refund_processor.repository import RefundRepository
 from ledger.service import LedgerService
 from wallet.service import WalletService
@@ -42,8 +43,30 @@ class RefundProcessor:
                     "message": "Available balance is less than refund amount",
                 }
 
+            payment_intent = await PaymentIntentRepository.get_by_id(
+                refund.payment_intent_id, db
+            )
+            if not payment_intent:
+                return {
+                    "status": "error",
+                    "message": "Payment intent not found for refund",
+                }
+            if payment_intent.refundable_amount < refund.amount:
+                return {
+                    "status": "error",
+                    "message": "Refundable amount no longer covers this refund",
+                }
+
             refund.status = RefundStatus.SUCCESS.value
             await RefundRepository.update(refund, db)
+
+            payment_intent = await PaymentIntentRepository.get_by_id(
+                refund.payment_intent_id, db
+            )
+            if payment_intent:
+                payment_intent.refundable_amount -= refund.amount
+                await PaymentIntentRepository.update(payment_intent, db)
+
             await LedgerService.create_debit_entry(refund, db)
             await WalletService.subtract_from_available_balance(refund.merchant_id, refund.amount, db)
             print(f"Refund processed successfully: {refund_id}")

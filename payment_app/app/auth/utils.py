@@ -42,6 +42,11 @@ class AuthUtils:
         )
     
     @staticmethod
+    def generate_webhook_secret() -> str:
+        """Generate a new webhook signing secret (HMAC key)."""
+        return f"whsec_{secrets.token_urlsafe(32)}"
+
+    @staticmethod
     def generate_api_key() -> str:
         """
         Utility to generate an API key.

@@ -61,4 +61,4 @@ class LedgerEntryRepository:
         result = await db.execute(
             select(LedgerEntry).where(LedgerEntry.merchant_id == merchant_id)
         )
-        return list[LedgerEntry](result.scalars().all())
+        return list(result.scalars().all())

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl, field_validator, model_validator
 
 
 class RegisterMerchantRequest(BaseModel):
@@ -61,3 +61,32 @@ class LoginMerchantResponse(BaseModel):
     message: str
     access_token: str
     token_type: str = "Bearer"
+
+
+class MerchantProfileResponse(BaseModel):
+    merchant_id: str
+    business_name: str
+    email: str
+    webhook_url: str | None = None
+    webhook_secret: str | None = None
+    api_key: str
+
+
+class UpdateWebhookRequest(BaseModel):
+    webhook_url: HttpUrl | None = None
+    regenerate_webhook_secret: bool = False
+
+    @field_validator("webhook_url", mode="before")
+    @classmethod
+    def empty_string_to_none(cls, v: object) -> object:
+        if v == "":
+            return None
+        return v
+
+    @model_validator(mode="after")
+    def non_empty_patch(self):
+        if self.webhook_url is None and not self.regenerate_webhook_secret:
+            raise ValueError(
+                "Provide webhook_url and/or enable regenerate_webhook_secret",
+            )
+        return self

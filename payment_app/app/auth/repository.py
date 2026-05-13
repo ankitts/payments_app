@@ -49,3 +49,10 @@ class MerchantRepository:
         await db.commit()
         await db.refresh(merchant)
         return merchant
+
+    @staticmethod
+    async def save(merchant: Merchant, db: AsyncSession) -> Merchant:
+        """Persist changes to an attached merchant row."""
+        await db.commit()
+        await db.refresh(merchant)
+        return merchant

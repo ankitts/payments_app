@@ -39,6 +39,12 @@ class PaymentIntent(Base):
         nullable=False,
     )
 
+    # Gross amount still refundable after successful refunds (see refund processor).
+    refundable_amount: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+
     currency: Mapped[str] = mapped_column(
         String(3),
         nullable=False,

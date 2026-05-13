@@ -33,8 +33,10 @@ class LedgerService:
             LedgerEntrySchema(
                 id=r.id,
                 merchant_id=r.merchant_id,
-                payment_intent_id=r.payment_intent_id,
-                entry_type=r.entry_type,
+                operation_id=r.operation_id,
+                entry_type=r.entry_type.value
+                if hasattr(r.entry_type, "value")
+                else str(r.entry_type),
                 amount=r.amount,
                 currency=r.currency,
                 description=r.description,

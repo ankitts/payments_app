@@ -61,7 +61,7 @@ class PaymentIntentRepository:
         result = await db.execute(
             select(PaymentIntent).where(PaymentIntent.merchant_id == merchant_id)
         )
-        return list[PaymentIntent](result.scalars().all())
+        return list(result.scalars().all())
     
 
     @staticmethod

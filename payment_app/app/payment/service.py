@@ -9,6 +9,19 @@ from config import PaymentStatus
 from payment.utils import PaymentUtils
 from payment.schemas import PaymentIntentSchema
 
+
+def _payment_intent_to_response(row: PaymentIntent) -> PaymentIntentResponse:
+    return PaymentIntentResponse(
+        payment_intent_id=row.id,
+        status=row.status,
+        amount=row.amount,
+        currency=row.currency,
+        order_id=row.order_id,
+        created_at=row.created_at,
+        refundable_amount=row.refundable_amount,
+    )
+
+
 class PaymentIntentService:
     """
     Service class for payment intents.
@@ -45,18 +58,14 @@ class PaymentIntentService:
                 )
             
             print("Duplicate payment intent found, returning existing payment intent:", row.id)
-            return PaymentIntentResponse(
-                payment_intent_id=row.id,
-                status=row.status,
-                amount=row.amount,
-                currency=row.currency,
-            )
+            return _payment_intent_to_response(row)
 
         # Create payment intent
         row = PaymentIntent(
             merchant_id=merchant.id,
             idempotency_key=request.idempotency_key,
             amount=request.amount,
+            refundable_amount=request.amount,
             currency=request.currency,
             status=PaymentStatus.CREATED.value,
             order_id=request.order_id,
@@ -73,12 +82,7 @@ class PaymentIntentService:
                 db=db,
             )  
  
-        return PaymentIntentResponse(
-            payment_intent_id=row.id,
-            status=row.status,
-            amount=row.amount,
-            currency=row.currency,
-        )
+        return _payment_intent_to_response(row)
 
     @staticmethod
     async def get_by_id(
@@ -114,12 +118,7 @@ class PaymentIntentService:
             )
         print("Payment intent found with ID:", payment_intent_id)
 
-        return PaymentIntentResponse(
-            payment_intent_id=row.id,
-            status=row.status,
-            amount=row.amount,
-            currency=row.currency,
-        )
+        return _payment_intent_to_response(row)
 
     @staticmethod
     async def list_for_merchant(
@@ -141,15 +140,7 @@ class PaymentIntentService:
         )
         print("Payment intents listed for merchant:", merchant.id)
 
-        return [
-            PaymentIntentResponse(
-                payment_intent_id=r.id,
-                status=r.status,
-                amount=r.amount,
-                currency=r.currency,
-            )
-            for r in rows
-        ]
+        return [_payment_intent_to_response(r) for r in rows]
 
     @staticmethod
     async def confirm(
@@ -201,9 +192,4 @@ class PaymentIntentService:
 
         print("Payment intent recorded for processing:", row.id)
 
-        return PaymentIntentResponse(
-            payment_intent_id=row.id,
-            status=row.status,
-            amount=row.amount,
-            currency=row.currency,
-        )
+        return _payment_intent_to_response(row)
